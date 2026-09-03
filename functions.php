@@ -34,4 +34,12 @@ require_once NORTHLINE_DIR . '/inc/enqueue.php';
 require_once NORTHLINE_DIR . '/inc/block-styles.php';
 require_once NORTHLINE_DIR . '/inc/patterns.php';
 require_once NORTHLINE_DIR . '/inc/template-tags.php';
+require_once NORTHLINE_DIR . '/inc/provisioning.php';
 require_once NORTHLINE_DIR . '/inc/starter-content.php';
+
+/**
+ * WP-CLI commands are only useful — and only loadable — under WP-CLI.
+ */
+if ( defined( 'WP_CLI' ) && WP_CLI ) {
+	require_once NORTHLINE_DIR . '/inc/cli.php';
+}

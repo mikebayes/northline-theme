@@ -22,9 +22,53 @@ Nothing outside that directory belongs to this project. The repo contains theme 
 
 ## First-time setup
 
-On a brand-new site, activating Northline triggers WordPress's native **starter content**, which creates the five pages, both menus and the front-page settings for you. Open **Appearance → Customize** and click *Publish* to keep it.
+### Provisioning (recommended)
 
-On an existing site, do it manually — it takes about five minutes:
+Run this once from the WordPress root (e.g. `/httpdocs`) after activating the theme:
+
+```bash
+wp northline provision --dry-run
+```
+
+It prints exactly what it would do and writes nothing. If the plan looks right:
+
+```bash
+wp northline provision
+```
+
+That creates the Home, About, Services, Insights and Contact pages with the designed block content, sets the static front page and posts page, builds and assigns the primary and footer menus, and sets the site title and tagline.
+
+To check the state of a site at any time:
+
+```bash
+wp northline status
+```
+
+**Why a command rather than starter content.** WordPress only offers `starter-content` on a genuinely fresh site — `is_fresh_site()` is false the moment anything has been published or edited, so on any real install (one that still has `Hello world!`, for instance) it is silently skipped. The command produces the same site, explicitly, on an install of any age.
+
+**What it will and will not do**
+
+| | |
+| --- | --- |
+| Creates pages only when they are missing | Matched by the `_northline_page` post meta marker, then by slug |
+| Never duplicates on a rerun | Existing pages are adopted, menu items are matched by page ID |
+| Never overwrites your edits | Once a page exists, its content is left alone |
+| Never deletes anything | `Hello world!`, `Sample Page` and the Privacy Policy are untouched |
+| Sets the site title once | On the first run only, so a later rename in WordPress survives a rerun |
+| Touches no files | Database content only; nothing outside this repository |
+
+Flags:
+
+| Flag | Effect |
+| --- | --- |
+| `--dry-run` | Print the plan, write nothing |
+| `--force-content` | **Destructive.** Reset the five pages to the theme's patterns, discarding editor changes. Prompts for confirmation |
+| `--force-settings` | Re-apply the site title and tagline |
+| `--user=<id\|login>` | Author the created pages as this user (otherwise the lowest-numbered administrator) |
+
+After provisioning, the page content is ordinary editorial content in `wp_posts`. It is edited in the block editor and is never read back from the theme's pattern files.
+
+### Doing it by hand instead
 
 1. **Pages** → create `Home`, `About`, `Services`, `Insights`, `Contact`.
 2. **Settings → Reading** → *Your homepage displays: A static page*; Homepage = `Home`, Posts page = `Insights`.
@@ -32,6 +76,8 @@ On an existing site, do it manually — it takes about five minutes:
 4. **Appearance → Customize → Site Identity** → set the logo, site title and tagline.
 5. **Appearance → Widgets** → fill *Footer Column 1–3* with contact details, hours and service areas.
 6. Edit each page and insert the matching pattern (below) as a starting point.
+
+In every case, **Appearance → Widgets** (Footer Column 1–3) and the site logo are still yours to fill in — provisioning does not invent contact details or upload a logo.
 
 ---
 
@@ -111,9 +157,9 @@ Dark sections restyle their children automatically — cards, eyebrows, lists, q
 
 Sections: Hero — Dark · Services — Card Grid · About — Split with Credentials Panel · Process — Numbered Steps · Testimonials — Three Up · Service Areas — Checklist Columns · Contact — Details, Hours and Emergency · Insights — Latest Articles · CTA — Dark Band
 
-Full pages: Page — Home · Page — About · Page — Services · Page — Contact
+Full pages: Page — Home · Page — About · Page — Services · Page — Insights · Page — Contact
 
-The full-page patterns are composed from the section patterns at registration time (see `patterns/page-home.php`), so editing a section updates every page pattern that uses it. Once inserted into a page, the blocks are ordinary content and belong to the editor.
+The full-page patterns are composed from the section patterns at registration time (see `patterns/page-home.php`), so editing a section updates every page pattern that uses it. Once inserted into a page — whether from the inserter or by `wp northline provision` — the blocks are ordinary content and belong to the editor.
 
 ---
 
@@ -127,8 +173,10 @@ inc/
   setup.php               Theme supports, menus, image sizes, widget areas
   enqueue.php             Front-end and editor assets
   block-styles.php        register_block_style() variations
-  patterns.php            Pattern categories
+  patterns.php            Pattern categories + pattern-to-string renderer
   template-tags.php       Template helpers
+  provisioning.php        Content manifest + idempotent provisioning routine
+  cli.php                 wp northline provision / status (loaded under WP-CLI only)
   starter-content.php     Native starter content for fresh installs
 header.php footer.php     Site chrome
 front-page.php            Home — edge-to-edge Gutenberg canvas
