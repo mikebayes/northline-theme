@@ -499,14 +499,24 @@ a {
    6. Page headers
    ---------------------------------------------------------------------- */
 
+/*
+ * A solid band rather than a fade to white: the header has to read as its own
+ * section, because on most pages the block below it is also white.
+ */
 .page-header {
 	padding-block: clamp(2.75rem, 7vw, 5.5rem) clamp(1.75rem, 4vw, 3rem);
-	background: linear-gradient(180deg, var(--wp--preset--color--surface, #f2f6f9) 0%, var(--wp--preset--color--base, #ffffff) 100%);
+	background: var(--wp--preset--color--surface, #f2f6f9);
 	border-bottom: var(--nl-hairline);
 }
 
+/*
+ * Page headers sit on the site's spine — the same 78rem shell as the site
+ * header, the footer and every block section — so the title lines up with the
+ * content beneath it. The reading measure is applied to the text itself, not
+ * to the container, for the same reason as .is-style-nl-intro above.
+ */
 .page-header__inner {
-	width: min(100% - (var(--nl-gutter) * 2), 54rem);
+	width: min(100% - (var(--nl-gutter) * 2), var(--nl-wide));
 	margin-inline: auto;
 }
 
@@ -529,6 +539,7 @@ a {
 
 .page-header__title {
 	margin: 0;
+	max-width: 46rem;
 	font-size: var(--wp--preset--font-size--xx-large, 2.75rem);
 	font-weight: 800;
 	line-height: 1.08;
@@ -571,6 +582,14 @@ a {
 .page-header--has-media {
 	padding-bottom: 0;
 	border-bottom: 0;
+}
+
+/*
+ * Single articles are the exception: their body copy sits in the centred 46rem
+ * reading column, so the header follows it there instead of the wide spine.
+ */
+.page-header--article .page-header__inner {
+	width: min(100% - (var(--nl-gutter) * 2), var(--nl-content));
 }
 
 .page-header--article .page-header__title {
@@ -616,8 +635,30 @@ a {
 	padding-block: 0;
 }
 
+/*
+ * A full-bleed section carries its own generous top padding. When one opens the
+ * content — as it does on every page built from the section patterns — the
+ * flow padding above it is dead space between the page header and the first
+ * band, so drop it. Pages that open with ordinary or wide blocks keep it,
+ * because those blocks bring no padding of their own.
+ */
+.entry-content:has(> .alignfull:first-child) {
+	padding-block-start: 0;
+}
+
+/*
+ * The Insights intro sits between the page header and the article grid, both of
+ * which are on the site's 78rem spine, so it follows them there rather than
+ * dropping into the centred reading column. Blocks the editor has explicitly
+ * aligned keep their own placement.
+ */
 .entry-content--intro {
-	padding-block: 0 clamp(1.5rem, 4vw, 3rem);
+	padding-block: clamp(1.75rem, 4vw, 2.75rem) clamp(1.5rem, 4vw, 3rem);
+}
+
+.entry-content--intro > :not(.alignwide):not(.alignfull) {
+	grid-column: wide;
+	max-width: var(--nl-content);
 }
 
 /* Vertical rhythm for top-level blocks. */
