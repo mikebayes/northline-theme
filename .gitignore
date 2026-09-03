@@ -1,0 +1,19 @@
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+.idea/
+.vscode/
+
+# Dependency + build output (the theme itself has no build step)
+node_modules/
+vendor/
+*.log
+
+# Never commit WordPress application files - this repo is the theme only
+/wp-admin/
+/wp-includes/
+/wp-content/
+wp-config.php
+wp-*.php

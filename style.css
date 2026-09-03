@@ -1,0 +1,20 @@
+/*
+Theme Name:         Northline
+Theme URI:          https://example.com/northline
+Author:             Northline Electrical
+Author URI:         https://example.com
+Description:        A small, professional brochure theme built for Northline Electrical, a Winnipeg electrical contractor. Northline is a hybrid classic theme: templates supply the structure and styling, while all page content is authored natively in the WordPress block editor. Ships with a full design-token layer in theme.json, custom block style variations and block patterns for assembling polished marketing pages without any third-party plugins.
+Version:            1.0.0
+Requires at least:  6.5
+Tested up to:       6.7
+Requires PHP:       7.4
+License:            GNU General Public License v2 or later
+License URI:        http://www.gnu.org/licenses/gpl-2.0.html
+Text Domain:        northline
+Tags:               business, blog, one-column, two-columns, block-patterns, block-styles, custom-colors, custom-logo, custom-menu, editor-style, featured-images, full-width-template, wide-blocks, translation-ready, accessibility-ready
+
+Northline is distributed under the terms of the GNU GPL v2 or later.
+
+Note: the front-end stylesheet lives in assets/css/theme.css. This file exists to
+carry the theme header and is intentionally kept free of layout rules.
+*/

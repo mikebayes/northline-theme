@@ -1,0 +1,590 @@
+/**
+ * Northline - block styling.
+ *
+ * Loaded on the front end AND inside the editor canvas (see inc/enqueue.php),
+ * so what an editor sees while writing is what visitors get.
+ *
+ * Everything here targets core blocks and the .is-style-* classes registered in
+ * inc/block-styles.php. Declarations are deliberately written at low specificity
+ * with :where() wherever an editor might want to override a value from the
+ * block sidebar - block supports emit inline styles, which will win.
+ *
+ * Contents
+ *   1. Section shells (Group)
+ *   2. Cards & panels
+ *   3. Columns
+ *   4. Typography variations
+ *   5. Lists
+ *   6. Media
+ *   7. Quotes & testimonials
+ *   8. Separators, covers, media-text, tables
+ *   9. Buttons
+ */
+
+/* -------------------------------------------------------------------------
+   1. Section shells
+   ---------------------------------------------------------------------- */
+
+/*
+ * Any full-bleed Group at the top level of the content gets the site gutter,
+ * whether or not it carries a section style - without this, a plain alignfull
+ * Group runs its text into the viewport edge. Editors who set their own
+ * horizontal padding in the sidebar override this, because block supports emit
+ * inline styles.
+ */
+.entry-content > .wp-block-group.alignfull,
+.is-root-container > .wp-block-group.alignfull,
+.wp-block-group.is-style-nl-section-dark,
+.wp-block-group.is-style-nl-section-surface {
+	padding-inline: var(--nl-gutter, 1.5rem);
+}
+
+.wp-block-group.is-style-nl-section-dark,
+.wp-block-group.is-style-nl-section-surface {
+	padding-block: clamp(3rem, 8vw, 6.5rem);
+}
+
+.wp-block-group.is-style-nl-section-surface {
+	background-color: var(--wp--preset--color--surface, #f2f6f9);
+}
+
+.wp-block-group.is-style-nl-section-dark {
+	position: relative;
+	isolation: isolate;
+	background-color: var(--wp--preset--color--ink, #0b1622);
+	background-image:
+		radial-gradient(120% 90% at 85% 0%, rgba(242, 160, 29, 0.16) 0%, rgba(242, 160, 29, 0) 55%),
+		linear-gradient(160deg, #0b1622 0%, #16283a 100%);
+	color: rgba(255, 255, 255, 0.78);
+	overflow: hidden;
+}
+
+/* A faint contour grid, echoing electrical schematics. */
+.wp-block-group.is-style-nl-section-dark::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	z-index: -1;
+	pointer-events: none;
+	background-image:
+		linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+		linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+	background-size: 72px 72px;
+	-webkit-mask-image: radial-gradient(100% 80% at 50% 0%, #000 0%, transparent 75%);
+	mask-image: radial-gradient(100% 80% at 50% 0%, #000 0%, transparent 75%);
+}
+
+.wp-block-group.is-style-nl-section-dark :where(h1, h2, h3, h4, h5) {
+	color: #ffffff;
+}
+
+.wp-block-group.is-style-nl-section-dark :where(h6) {
+	color: var(--wp--preset--color--primary, #f2a01d);
+}
+
+.wp-block-group.is-style-nl-section-dark :where(a:not(.wp-element-button)) {
+	color: var(--wp--preset--color--primary, #f2a01d);
+}
+
+.wp-block-group.is-style-nl-section-dark :where(hr.wp-block-separator) {
+	border-color: rgba(255, 255, 255, 0.16);
+}
+
+/*
+ * Section intro: a narrow measure for eyebrow + heading + lead, pinned to the
+ * left edge of the section rather than centred, so the intro and the section
+ * body below it share one alignment.
+ */
+.wp-block-group.is-style-nl-intro {
+	max-width: 46rem;
+	margin-inline: 0;
+}
+
+/* Accent rule across the top edge of a section. */
+.is-style-nl-rule-top {
+	position: relative;
+}
+
+.is-style-nl-rule-top::after {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: clamp(4rem, 10vw, 7rem);
+	height: 3px;
+	background: var(--wp--preset--color--primary, #f2a01d);
+}
+
+/* -------------------------------------------------------------------------
+   2. Cards & panels
+   ---------------------------------------------------------------------- */
+
+.is-style-nl-card {
+	height: 100%;
+	padding: clamp(1.5rem, 3vw, 2.25rem);
+	background-color: var(--wp--preset--color--base, #ffffff);
+	border: 1px solid var(--wp--preset--color--line, #dbe3ec);
+	border-radius: var(--nl-radius-lg, 12px);
+	transition: transform 180ms cubic-bezier(0.2, 0, 0.2, 1), box-shadow 180ms cubic-bezier(0.2, 0, 0.2, 1), border-color 180ms cubic-bezier(0.2, 0, 0.2, 1);
+}
+
+.is-style-nl-card:hover {
+	transform: translateY(-3px);
+	border-color: transparent;
+	box-shadow: var(--nl-shadow-lift, 0 18px 40px -18px rgba(11, 22, 34, 0.3));
+}
+
+.wp-block-group.is-style-nl-section-dark .is-style-nl-card {
+	background-color: rgba(255, 255, 255, 0.04);
+	border-color: rgba(255, 255, 255, 0.12);
+	color: rgba(255, 255, 255, 0.76);
+}
+
+.wp-block-group.is-style-nl-section-dark .is-style-nl-card:hover {
+	background-color: rgba(255, 255, 255, 0.07);
+	border-color: rgba(242, 160, 29, 0.5);
+	box-shadow: none;
+	transform: none;
+}
+
+/* Cards read better with a tighter internal rhythm than the page default. */
+.is-style-nl-card > * + *,
+.wp-block-columns.is-style-nl-cards > .wp-block-column > * + * {
+	margin-block-start: var(--wp--preset--spacing--30, 1rem);
+}
+
+.is-style-nl-panel-outline {
+	padding: clamp(1.5rem, 3vw, 2.25rem);
+	border: 1px solid var(--wp--preset--color--line, #dbe3ec);
+	border-radius: var(--nl-radius-lg, 12px);
+}
+
+.wp-block-group.is-style-nl-section-dark .is-style-nl-panel-outline {
+	border-color: rgba(255, 255, 255, 0.16);
+}
+
+/* -------------------------------------------------------------------------
+   3. Columns
+   ---------------------------------------------------------------------- */
+
+/* Turn every column of a Columns block into a card in one click. */
+.wp-block-columns.is-style-nl-cards > .wp-block-column {
+	padding: clamp(1.5rem, 3vw, 2.25rem);
+	background-color: var(--wp--preset--color--base, #ffffff);
+	border: 1px solid var(--wp--preset--color--line, #dbe3ec);
+	border-radius: var(--nl-radius-lg, 12px);
+	transition: transform 180ms cubic-bezier(0.2, 0, 0.2, 1), box-shadow 180ms cubic-bezier(0.2, 0, 0.2, 1), border-color 180ms cubic-bezier(0.2, 0, 0.2, 1);
+}
+
+.wp-block-columns.is-style-nl-cards > .wp-block-column:hover {
+	transform: translateY(-3px);
+	border-color: transparent;
+	box-shadow: var(--nl-shadow-lift, 0 18px 40px -18px rgba(11, 22, 34, 0.3));
+}
+
+.wp-block-group.is-style-nl-section-dark .wp-block-columns.is-style-nl-cards > .wp-block-column {
+	background-color: rgba(255, 255, 255, 0.04);
+	border-color: rgba(255, 255, 255, 0.12);
+}
+
+.wp-block-group.is-style-nl-section-dark .wp-block-columns.is-style-nl-cards > .wp-block-column:hover {
+	transform: none;
+	box-shadow: none;
+	border-color: rgba(242, 160, 29, 0.5);
+}
+
+.wp-block-columns.is-style-nl-divided > .wp-block-column + .wp-block-column {
+	padding-left: clamp(1.25rem, 3vw, 2.5rem);
+	border-left: 1px solid var(--wp--preset--color--line, #dbe3ec);
+}
+
+.wp-block-group.is-style-nl-section-dark .wp-block-columns.is-style-nl-divided > .wp-block-column + .wp-block-column {
+	border-left-color: rgba(255, 255, 255, 0.16);
+}
+
+@media (max-width: 781px) {
+	.wp-block-columns.is-style-nl-divided > .wp-block-column + .wp-block-column {
+		padding-left: 0;
+		padding-top: clamp(1.25rem, 3vw, 2.5rem);
+		border-left: 0;
+		border-top: 1px solid var(--wp--preset--color--line, #dbe3ec);
+	}
+}
+
+/* -------------------------------------------------------------------------
+   4. Typography variations
+   ---------------------------------------------------------------------- */
+
+.is-style-nl-eyebrow {
+	margin-bottom: 0.75rem;
+	font-size: var(--wp--preset--font-size--x-small, 0.8125rem);
+	font-weight: 700;
+	letter-spacing: var(--nl-tracking-eyebrow, 0.14em);
+	line-height: 1.4;
+	text-transform: uppercase;
+	color: var(--wp--preset--color--steel, #5b6e81);
+}
+
+.wp-block-group.is-style-nl-section-dark .is-style-nl-eyebrow {
+	color: var(--wp--preset--color--primary, #f2a01d);
+}
+
+.is-style-nl-eyebrow::before {
+	content: "";
+	display: inline-block;
+	width: 1.5rem;
+	height: 2px;
+	margin-right: 0.65rem;
+	vertical-align: middle;
+	background: currentColor;
+}
+
+.is-style-nl-underline {
+	padding-bottom: 0.5em;
+	border-bottom: 3px solid var(--wp--preset--color--primary, #f2a01d);
+	display: inline-block;
+}
+
+.is-style-nl-lead {
+	font-size: var(--wp--preset--font-size--large, 1.375rem);
+	line-height: 1.55;
+	letter-spacing: -0.012em;
+	color: var(--wp--preset--color--steel, #5b6e81);
+	text-wrap: pretty;
+}
+
+.wp-block-group.is-style-nl-section-dark .is-style-nl-lead {
+	color: rgba(255, 255, 255, 0.8);
+}
+
+/* -------------------------------------------------------------------------
+   5. Lists
+   ---------------------------------------------------------------------- */
+
+ul.is-style-nl-checklist {
+	list-style: none;
+	margin-left: 0;
+	padding-left: 0;
+}
+
+ul.is-style-nl-checklist > li {
+	position: relative;
+	padding-left: 2rem;
+	margin-bottom: 0.7rem;
+}
+
+ul.is-style-nl-checklist > li::before {
+	content: "";
+	position: absolute;
+	left: 0;
+	top: 0.45em;
+	width: 1.1rem;
+	height: 0.55rem;
+	border-left: 2px solid var(--wp--preset--color--primary, #f2a01d);
+	border-bottom: 2px solid var(--wp--preset--color--primary, #f2a01d);
+	transform: rotate(-45deg);
+}
+
+ul.is-style-nl-specs,
+ol.is-style-nl-specs {
+	list-style: none;
+	margin-left: 0;
+	padding-left: 0;
+	font-size: var(--wp--preset--font-size--small, 0.9375rem);
+}
+
+.is-style-nl-specs > li {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem 1rem;
+	justify-content: space-between;
+	padding-block: 0.75rem;
+	border-bottom: 1px solid var(--wp--preset--color--line, #dbe3ec);
+}
+
+.is-style-nl-specs > li strong {
+	color: var(--wp--preset--color--ink, #0b1622);
+}
+
+.wp-block-group.is-style-nl-section-dark .is-style-nl-specs > li {
+	border-bottom-color: rgba(255, 255, 255, 0.14);
+}
+
+.wp-block-group.is-style-nl-section-dark .is-style-nl-specs > li strong {
+	color: #ffffff;
+}
+
+/* -------------------------------------------------------------------------
+   6. Media
+   ---------------------------------------------------------------------- */
+
+.wp-block-image.is-style-nl-framed img {
+	border-radius: var(--nl-radius-lg, 12px);
+	box-shadow: 0 0 0 1px var(--wp--preset--color--line, #dbe3ec), 0 0 0 10px var(--wp--preset--color--surface, #f2f6f9);
+}
+
+.wp-block-image.is-style-nl-soft img {
+	border-radius: var(--nl-radius-lg, 12px);
+	box-shadow: var(--nl-shadow-lift, 0 18px 40px -18px rgba(11, 22, 34, 0.3));
+}
+
+/* -------------------------------------------------------------------------
+   7. Quotes & testimonials
+   ---------------------------------------------------------------------- */
+
+/*
+ * White card rather than a surface fill: testimonials are usually placed on a
+ * Surface section, where a surface-filled card would disappear.
+ */
+.wp-block-quote.is-style-nl-testimonial {
+	position: relative;
+	margin: 0;
+	height: 100%;
+	padding: clamp(1.5rem, 2.6vw, 2.25rem);
+	background: var(--wp--preset--color--base, #ffffff);
+	border: 1px solid var(--wp--preset--color--line, #dbe3ec);
+	border-radius: var(--nl-radius-lg, 12px);
+}
+
+.wp-block-quote.is-style-nl-testimonial::before {
+	content: "";
+	position: absolute;
+	top: -1px;
+	left: clamp(1.5rem, 2.6vw, 2.25rem);
+	width: 2.5rem;
+	height: 3px;
+	background: var(--wp--preset--color--primary, #f2a01d);
+}
+
+.wp-block-quote.is-style-nl-testimonial p {
+	font-size: clamp(1.0625rem, 0.95rem + 0.6vw, 1.25rem);
+	line-height: 1.5;
+	letter-spacing: -0.015em;
+	color: var(--wp--preset--color--ink, #0b1622);
+	text-wrap: pretty;
+}
+
+.wp-block-quote.is-style-nl-testimonial cite {
+	display: block;
+	margin-top: 1rem;
+	font-size: var(--wp--preset--font-size--x-small, 0.8125rem);
+	font-style: normal;
+	font-weight: 700;
+	letter-spacing: var(--nl-tracking-eyebrow, 0.14em);
+	text-transform: uppercase;
+	color: var(--wp--preset--color--steel, #5b6e81);
+}
+
+.wp-block-group.is-style-nl-section-dark .wp-block-quote.is-style-nl-testimonial {
+	background: rgba(255, 255, 255, 0.05);
+	border-color: rgba(255, 255, 255, 0.12);
+}
+
+.wp-block-group.is-style-nl-section-dark .wp-block-quote.is-style-nl-testimonial p {
+	color: #ffffff;
+}
+
+.wp-block-group.is-style-nl-section-dark .wp-block-quote.is-style-nl-testimonial cite {
+	color: rgba(255, 255, 255, 0.65);
+}
+
+/* -------------------------------------------------------------------------
+   8. Separators, covers, media-text, tables
+   ---------------------------------------------------------------------- */
+
+.wp-block-separator.is-style-nl-accent {
+	width: clamp(4rem, 10vw, 7rem);
+	height: 3px;
+	margin-inline: 0;
+	background: var(--wp--preset--color--primary, #f2a01d);
+	border: 0;
+	opacity: 1;
+}
+
+.wp-block-cover.is-style-nl-scrim .wp-block-cover__background {
+	background: linear-gradient(180deg, rgba(11, 22, 34, 0.15) 0%, rgba(11, 22, 34, 0.85) 100%) !important;
+	opacity: 1 !important;
+}
+
+.wp-block-cover.is-style-nl-scrim .wp-block-cover__inner-container {
+	align-self: end;
+}
+
+.wp-block-media-text.is-style-nl-panel .wp-block-media-text__content {
+	padding: clamp(1.75rem, 4vw, 3rem);
+	background: var(--wp--preset--color--surface, #f2f6f9);
+	border-radius: var(--nl-radius-lg, 12px);
+}
+
+.wp-block-media-text.is-style-nl-panel img {
+	border-radius: var(--nl-radius-lg, 12px);
+}
+
+.wp-block-table.is-style-nl-clean table {
+	border-collapse: collapse;
+	width: 100%;
+}
+
+.wp-block-table.is-style-nl-clean :where(td, th) {
+	padding: 0.85rem 1rem;
+	border: 0;
+	border-bottom: 1px solid var(--wp--preset--color--line, #dbe3ec);
+	text-align: left;
+}
+
+.wp-block-table.is-style-nl-clean thead th {
+	font-size: var(--wp--preset--font-size--x-small, 0.8125rem);
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--wp--preset--color--steel, #5b6e81);
+}
+
+/* -------------------------------------------------------------------------
+   9. Buttons
+   ---------------------------------------------------------------------- */
+
+.wp-block-button__link {
+	transition: background-color 180ms cubic-bezier(0.2, 0, 0.2, 1), color 180ms cubic-bezier(0.2, 0, 0.2, 1), border-color 180ms cubic-bezier(0.2, 0, 0.2, 1);
+}
+
+/* Core's outline variation, tuned for Northline. */
+.wp-block-button.is-style-outline > .wp-block-button__link {
+	border-width: 1px;
+}
+
+.wp-block-group.is-style-nl-section-dark .wp-block-button.is-style-outline > .wp-block-button__link:not(.has-text-color) {
+	color: #ffffff;
+	border-color: rgba(255, 255, 255, 0.4);
+}
+
+.wp-block-group.is-style-nl-section-dark .wp-block-button.is-style-outline > .wp-block-button__link:not(.has-text-color):hover {
+	background-color: #ffffff;
+	border-color: #ffffff;
+	color: var(--wp--preset--color--ink, #0b1622);
+}
+
+@media (max-width: 600px) {
+	.wp-block-buttons.is-style-nl-stacked-mobile {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.wp-block-buttons.is-style-nl-stacked-mobile .wp-block-button,
+	.wp-block-buttons.is-style-nl-stacked-mobile .wp-block-button__link {
+		width: 100%;
+		text-align: center;
+	}
+}
+
+/* -------------------------------------------------------------------------
+   10. Latest Posts
+   ----------------------------------------------------------------------
+
+   The core Latest Posts block is the theme's dynamic Insights teaser, so it
+   is styled to match the post cards used on archives.
+*/
+
+.wp-block-latest-posts.is-grid {
+	display: grid;
+	gap: clamp(1.5rem, 3vw, 2.5rem);
+	grid-template-columns: 1fr;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+/* Honour the block's own column count instead of overriding it. */
+@media (min-width: 600px) {
+	.wp-block-latest-posts.is-grid.columns-2,
+	.wp-block-latest-posts.is-grid.columns-3,
+	.wp-block-latest-posts.is-grid.columns-4,
+	.wp-block-latest-posts.is-grid.columns-5,
+	.wp-block-latest-posts.is-grid.columns-6 {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+@media (min-width: 900px) {
+	.wp-block-latest-posts.is-grid.columns-3 {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+
+	.wp-block-latest-posts.is-grid.columns-4 {
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+	}
+
+	.wp-block-latest-posts.is-grid.columns-5 {
+		grid-template-columns: repeat(5, minmax(0, 1fr));
+	}
+
+	.wp-block-latest-posts.is-grid.columns-6 {
+		grid-template-columns: repeat(6, minmax(0, 1fr));
+	}
+}
+
+.wp-block-latest-posts.is-grid > li {
+	display: flex;
+	flex-direction: column;
+	margin: 0;
+	background: var(--wp--preset--color--base, #ffffff);
+	border: 1px solid var(--wp--preset--color--line, #dbe3ec);
+	border-radius: var(--nl-radius-lg, 12px);
+	overflow: hidden;
+	transition: transform 180ms cubic-bezier(0.2, 0, 0.2, 1), box-shadow 180ms cubic-bezier(0.2, 0, 0.2, 1), border-color 180ms cubic-bezier(0.2, 0, 0.2, 1);
+}
+
+.wp-block-latest-posts.is-grid > li:hover {
+	transform: translateY(-3px);
+	border-color: transparent;
+	box-shadow: var(--nl-shadow-lift, 0 18px 40px -18px rgba(11, 22, 34, 0.3));
+}
+
+.wp-block-latest-posts__featured-image {
+	margin: 0;
+	aspect-ratio: 10 / 7;
+	background: var(--wp--preset--color--surface, #f2f6f9);
+	overflow: hidden;
+}
+
+.wp-block-latest-posts__featured-image img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.wp-block-latest-posts.is-grid > li > a.wp-block-latest-posts__post-title {
+	display: block;
+	padding: clamp(1.25rem, 2.5vw, 1.75rem) clamp(1.25rem, 2.5vw, 1.75rem) 0;
+	font-size: var(--wp--preset--font-size--large, 1.375rem);
+	font-weight: 700;
+	line-height: 1.25;
+	letter-spacing: -0.018em;
+	text-decoration: none;
+	color: var(--wp--preset--color--ink, #0b1622);
+	text-wrap: balance;
+}
+
+.wp-block-latest-posts__post-date {
+	display: block;
+	padding-inline: clamp(1.25rem, 2.5vw, 1.75rem);
+	padding-top: 0.6rem;
+	font-size: var(--wp--preset--font-size--x-small, 0.8125rem);
+	color: var(--wp--preset--color--steel, #5b6e81);
+}
+
+.wp-block-latest-posts__post-excerpt,
+.wp-block-latest-posts__post-full-content {
+	margin: 0;
+	padding: 0.7rem clamp(1.25rem, 2.5vw, 1.75rem) clamp(1.25rem, 2.5vw, 1.75rem);
+	font-size: var(--wp--preset--font-size--small, 0.9375rem);
+	color: var(--wp--preset--color--steel, #5b6e81);
+}
+
+.wp-block-group.is-style-nl-section-dark .wp-block-latest-posts.is-grid > li {
+	background: rgba(255, 255, 255, 0.04);
+	border-color: rgba(255, 255, 255, 0.12);
+}
+
+.wp-block-group.is-style-nl-section-dark .wp-block-latest-posts.is-grid > li > a.wp-block-latest-posts__post-title {
+	color: #ffffff;
+}
