@@ -461,6 +461,10 @@ function northline_provision_site( $options = array() ) {
 
 	$menu_ids = isset( $state['menus'] ) ? (array) $state['menus'] : array();
 
+	// Clear any half-written menu records from an interrupted earlier run so
+	// this one starts from a consistent state.
+	northline_prune_orphan_menu_items( $page_ids, $dry, $report );
+
 	foreach ( $manifest['menus'] as $location => $menu_config ) {
 		$menu_id = northline_provision_menu( $location, $menu_config, $manifest['pages'], $page_ids, $state, $options, $report );
 
@@ -564,6 +568,90 @@ function northline_provision_site( $options = array() ) {
 	}
 
 	return $report;
+}
+
+/**
+ * Remove menu-item records that belong to no menu at all.
+ *
+ * wp_update_nav_menu_item() inserts the nav_menu_item post before it finishes
+ * writing that item's meta, so a run that dies partway through — as an earlier
+ * version of this file did on WordPress 7.1 — can leave a nav_menu_item post
+ * that was never attached to a menu.
+ *
+ * A nav_menu_item with no `nav_menu` term is not part of any menu and is
+ * rendered nowhere, so removing one cannot change what a visitor or an editor
+ * sees. The candidates are further narrowed to items pointing at pages this
+ * command provisioned, which is what makes them attributable to an interrupted
+ * run of this command rather than to anything a person did.
+ *
+ * @param array $page_ids Provisioned page IDs keyed by manifest key.
+ * @param bool  $dry      Whether this is a dry run.
+ * @param array $report   Report, passed by reference.
+ * @return void
+ */
+function northline_prune_orphan_menu_items( $page_ids, $dry, array &$report ) {
+	$page_ids = array_filter( array_map( 'intval', (array) $page_ids ) );
+
+	if ( empty( $page_ids ) ) {
+		return;
+	}
+
+	$candidates = get_posts(
+		array(
+			'post_type'              => 'nav_menu_item',
+			'post_status'            => 'any',
+			'numberposts'            => 100,
+			'fields'                 => 'ids',
+			'no_found_rows'          => true,
+			'update_post_term_cache' => false,
+			'suppress_filters'       => false,
+			'meta_query'             => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+				array(
+					'key'     => '_menu_item_object_id',
+					'value'   => array_map( 'strval', array_values( $page_ids ) ),
+					'compare' => 'IN',
+				),
+			),
+		)
+	);
+
+	$removed = 0;
+
+	foreach ( $candidates as $candidate_id ) {
+		$terms = wp_get_object_terms( $candidate_id, 'nav_menu', array( 'fields' => 'ids' ) );
+
+		// Attached to a menu: it is a real menu item, leave it alone.
+		if ( is_wp_error( $terms ) || ! empty( $terms ) ) {
+			continue;
+		}
+
+		if ( ! $dry ) {
+			wp_delete_post( $candidate_id, true );
+		}
+
+		++$removed;
+	}
+
+	if ( ! $removed ) {
+		return;
+	}
+
+	northline_provisioning_step(
+		$report,
+		'menu',
+		'orphan cleanup',
+		$dry ? 'planned' : 'updated',
+		sprintf(
+			/* translators: %d: number of orphaned menu item records. */
+			_n(
+				'removed %d menu-item record left behind by an interrupted run',
+				'removed %d menu-item records left behind by an interrupted run',
+				$removed,
+				'northline'
+			),
+			$removed
+		)
+	);
 }
 
 /**
@@ -741,8 +829,15 @@ function northline_provision_menu( $location, $menu_config, $pages, $page_ids, $
 
 		++$position;
 
-		$classes = isset( $pages[ $key ]['menu_classes'] ) ? (string) $pages[ $key ]['menu_classes'] : '';
-		$classes = '' === $classes ? array() : array_map( 'sanitize_html_class', explode( ' ', $classes ) );
+		/*
+		 * menu-item-classes must be a SPACE-SEPARATED STRING, not an array.
+		 * wp_update_nav_menu_item() normalises it itself with
+		 * array_map( 'sanitize_html_class', explode( ' ', ... ) ) and stores the
+		 * resulting array in _menu_item_classes, so passing an array makes core
+		 * call explode() on an array — a TypeError on modern PHP. This matches
+		 * what the Menus admin screen submits.
+		 */
+		$classes = isset( $pages[ $key ]['menu_classes'] ) ? trim( (string) $pages[ $key ]['menu_classes'] ) : '';
 
 		// The menu item title is deliberately left empty so the item follows
 		// the page title, including any later rename in the admin.
@@ -769,10 +864,8 @@ function northline_provision_menu( $location, $menu_config, $pages, $page_ids, $
 			continue;
 		}
 
-		// _menu_item_classes must be an array for the nav walker. Write it
-		// explicitly so the value is well-formed regardless of core version.
-		update_post_meta( $item_id, '_menu_item_classes', $classes );
-
+		// No _menu_item_classes write here: wp_update_nav_menu_item() has
+		// already stored the sanitised array form for us.
 		$linked[ $page_id ] = true;
 		$added[]            = $key;
 	}
