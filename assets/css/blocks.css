@@ -94,10 +94,16 @@
  * Section intro: a narrow measure for eyebrow + heading + lead, pinned to the
  * left edge of the section rather than centred, so the intro and the section
  * body below it share one alignment.
+ *
+ * The measure is applied to the intro's CHILDREN, not to the intro itself.
+ * Core's constrained-layout CSS sets `margin-left: auto !important` on every
+ * direct child of a constrained container, so narrowing the intro Group would
+ * only re-centre it and no author rule could win that. Letting the Group fill
+ * its container and capping the blocks inside it sidesteps the fight: those
+ * blocks sit in a flow layout, where a max-width simply left-aligns.
  */
-.wp-block-group.is-style-nl-intro {
+.wp-block-group.is-style-nl-intro > * {
 	max-width: 46rem;
-	margin-inline: 0;
 }
 
 /* Accent rule across the top edge of a section. */
