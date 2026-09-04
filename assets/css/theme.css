@@ -510,13 +510,18 @@ a {
 }
 
 /*
- * ...unless the content opens with a Surface band of its own, as the Services
- * page does. Two tinted blocks in a row read as one very long grey zone that
- * only ends partway down the page, so the header steps back to the base colour
- * and the bands alternate again.
+ * When the content opens with a Surface band of its own — as the Services page
+ * does — the two tinted blocks stack into one very long grey zone that only
+ * ends partway down the page. The page header keeps its tint, since that is
+ * consistent across every page; it is the repeated band directly beneath it
+ * that drops to the base colour so the page alternates again.
+ *
+ * Only the first section is affected, and only directly under a page header:
+ * the same Surface style used anywhere else on the page, or on the front page,
+ * renders normally.
  */
-.page-header:has(+ .entry-content > .is-style-nl-section-surface:first-child) {
-	background: var(--wp--preset--color--base, #ffffff);
+.page-header + .entry-content > .is-style-nl-section-surface:first-child {
+	background-color: var(--wp--preset--color--base, #ffffff);
 }
 
 /*
