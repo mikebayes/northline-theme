@@ -510,6 +510,16 @@ a {
 }
 
 /*
+ * ...unless the content opens with a Surface band of its own, as the Services
+ * page does. Two tinted blocks in a row read as one very long grey zone that
+ * only ends partway down the page, so the header steps back to the base colour
+ * and the bands alternate again.
+ */
+.page-header:has(+ .entry-content > .is-style-nl-section-surface:first-child) {
+	background: var(--wp--preset--color--base, #ffffff);
+}
+
+/*
  * Page headers sit on the site's spine — the same 78rem shell as the site
  * header, the footer and every block section — so the title lines up with the
  * content beneath it. The reading measure is applied to the text itself, not
