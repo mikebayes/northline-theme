@@ -51,10 +51,19 @@
 .wp-block-group.is-style-nl-section-dark {
 	position: relative;
 	isolation: isolate;
-	background-color: var(--wp--preset--color--ink, #0b1622);
+	/*
+	 * Deep forest green. Not taken from the ink/slate palette tokens on
+	 * purpose: those drive headings, body copy, buttons and the footer
+	 * site-wide, so the section background is held locally here.
+	 *
+	 * The two stops are luminance-matched to the navy they replace, which
+	 * keeps every contrast ratio in this section where it was: white headings
+	 * 18.3:1, body copy at 78% white 9.0:1, amber accents 7.1:1.
+	 */
+	background-color: #08180d;
 	background-image:
 		radial-gradient(120% 90% at 85% 0%, rgba(242, 160, 29, 0.16) 0%, rgba(242, 160, 29, 0) 55%),
-		linear-gradient(160deg, #0b1622 0%, #16283a 100%);
+		linear-gradient(160deg, #08180d 0%, #102b16 100%);
 	color: rgba(255, 255, 255, 0.78);
 	overflow: hidden;
 }
